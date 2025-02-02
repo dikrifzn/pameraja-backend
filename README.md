@@ -91,6 +91,7 @@ This API is built using Django to manage users, social media accounts, projects,
    - **Endpoint:** `/api/users/{id}`
    - **Description:** Fetch user profile by ID.
 
+    ### Response
     if success
    ```json
     {
@@ -119,6 +120,19 @@ This API is built using Django to manage users, social media accounts, projects,
    - **Endpoint:** `/api/users/{id}`
    - **Description:** Update user profile information.
 
+    ### Request
+    ```json
+    {
+        {
+            "name": "User Example",
+            "email": "user@gmail.com",
+            "position": "CEO Google",
+            "address": "Jl. Veteran No. 140",
+            "password": "user123" //opsional
+        }
+    }
+    ```
+    ### Response
     if success
    ```json
     {
@@ -147,7 +161,7 @@ This API is built using Django to manage users, social media accounts, projects,
     }
     ```
 
-   if not found
+   if user not found
       ```json
     {
         "message": "User not found"
@@ -160,6 +174,7 @@ This API is built using Django to manage users, social media accounts, projects,
    - **Endpoint:** `/api/users/{id}`
    - **Description:** Delete a user account.
 
+    ### Response
    if success
 
    ```json
@@ -168,7 +183,7 @@ This API is built using Django to manage users, social media accounts, projects,
     }
    ```
 
-   if not found
+   if user not found
       ```json
     {
         "message": "User not found"
@@ -180,24 +195,140 @@ This API is built using Django to manage users, social media accounts, projects,
 ### **Social Media Management**
 8. **Add Social Media**
    - **Method:** POST
-   - **Endpoint:** `/api/social-media`
+   - **Endpoint:** `/api/social-media/{id_user}`
    - **Description:** Add a social media account for the user.
+
+    ### Request
+    ```json
+    {
+        "id_user": "1",
+        "name": "Instagram",
+        "url": "https://instagram.com/dikrifzn"
+    }
+    ```
+    ### Response
+    if user not found
+      ```json
+    {
+        "message": "User not found"
+    }
+    ```
+    if success
+    ```json
+    {
+        "message": "Social media account added successfully",
+        "data": {
+            "id": 1,
+            "name": "Instagram",
+            "url": "https://instagram.com/example",
+            "created_at": "2025-01-31T15:17:02.507805Z",
+            "edited_at": "2025-01-31T15:17:02.507847Z",
+            "id_user": 1
+        }
+    }
+    ```
 
 9. **Get Social Media**
    - **Method:** GET
    - **Endpoint:** `/api/social-media/{id_user}`
    - **Description:** Fetch social media accounts by user ID.
 
+    ### Response
+    if user not found
+    ```json
+    {
+        "message": "User not found"
+    }
+    ```
+
+    if success
+    ```json
+    {
+        "message": "Social Media User retrieved successfully",
+        "data": {
+            "id": 1,
+            "name": "instagram",
+            "url": "https://www.instagram.com/example",
+            "created_at": "2025-01-27T09:59:50.957601Z",
+            "edited_at": "2025-01-27T09:59:50.957640Z",
+            "id_user": 1
+        }
+    }
+
 10. **Update Social Media**
     - **Method:** PUT/PATCH
     - **Endpoint:** `/api/social-media/{id}`
     - **Description:** Update social media account information.
 
+    ### Request
+    ```json
+    {
+        "id_user": "1",
+        "name": "Instagram",
+        "url": "https://instagram.com/example"
+    }
+    ```
+
+    ### Response
+    if user not found
+    ```json
+    {
+        "message": "User not found"
+    }
+    ```
+
+    if success
+    ```json
+    {
+        "message": "Social Media User updated successfully",
+        "data": {
+            "id": 3,
+            "name": "Instagram",
+            "url": "https://instagram.com/example",
+            "created_at": "2025-01-31T15:17:02.507805Z",
+            "edited_at": "2025-02-02T15:27:21.042478Z",
+            "id_user": 1
+        }
+    }
+    ```
+
+    if error
+    ```json
+    {
+        "message": "Failed to update user Social Media User",
+        "errors": {
+            "error point": [
+                "Description problem"
+            ]
+        }
+    }
+    ```
+
 11. **Delete Social Media**
     - **Method:** DELETE
     - **Endpoint:** `/api/social-media/{id}`
     - **Description:** Delete a specific social media account.
-
+    
+    ### Request
+    ```json
+    {
+        "social_media_id": "1"
+    }
+    ```
+    ### Response
+    if user not found
+    ```json
+    {
+        "message": "User not found"
+    }
+    ```
+     
+    if success
+    ```json
+    {
+        "message": "Social Media berhasil dihapus"
+    }
+    ```
 ---
 
 ### **Project Management**
