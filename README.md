@@ -256,7 +256,7 @@ This API is built using Django to manage users, social media accounts, projects,
     }
 
 10. **Update Social Media**
-    - **Method:** PUT/PATCH
+    - **Method:** PUT
     - **Endpoint:** `/api/social-media/{id}`
     - **Description:** Update social media account information.
 
@@ -332,15 +332,38 @@ This API is built using Django to manage users, social media accounts, projects,
 ---
 
 ### **Project Management**
-12. **Create Project**
+12. **Get All Projects**
+    - **Method:** GET
+    - **Endpoint:** `/api/project/`
+    - **Description:** Fetch all projects.
+
+    ### Response
+    ```json
+    {
+        "count": 1,
+        "next": null,
+        "previous": null,
+        "results": [
+            {
+                "id": 1,
+                "title": "Sistem Absensi",
+                "description": "Pembuatan sistem absensi",
+                "category": "pendidikan, Manajemen",
+                "file_url": "test",
+                "image_url": "test",
+                "views": 1,
+                "created_at": "2025-01-27T09:52:35.810295Z",
+                "edited_at": "2025-01-27T09:52:35.810337Z",
+                "id_user": 1
+            }
+        ]
+    }
+    ```
+
+13. **Create Project**
     - **Method:** POST
     - **Endpoint:** `/api/projects`
     - **Description:** Add a new project.
-
-13. **Get All Projects**
-    - **Method:** GET
-    - **Endpoint:** `/api/projects`
-    - **Description:** Fetch all projects.
 
 14. **Get Project Details**
     - **Method:** GET
@@ -348,7 +371,7 @@ This API is built using Django to manage users, social media accounts, projects,
     - **Description:** Fetch project details by ID.
 
 15. **Update Project**
-    - **Method:** PUT/PATCH
+    - **Method:** PUT
     - **Endpoint:** `/api/projects/{id}`
     - **Description:** Update project information.
 
