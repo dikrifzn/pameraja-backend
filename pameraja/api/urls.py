@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import UserAPI, SocialMediaAPI, UserProfileAPI, ProjectAPI, CommentAPI
+from .views import UserAPI, SocialMediaAPI, UserProfileAPI, ProjectAPI, CommentAPI, LikeAPI
 
 urlpatterns = [
     path('users/', UserAPI.as_view(), name='user-list'),
@@ -8,4 +8,5 @@ urlpatterns = [
     path('project/', ProjectAPI.as_view(), name='project-all'),
     path('project/<int:id>', ProjectAPI.as_view(), name='project-list'),
     path('comment/<int:id>', CommentAPI.as_view(), name='comment-project'),
+    path('like/<int:id>', LikeAPI.as_view(), name='like-project')
 ]

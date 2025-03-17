@@ -30,7 +30,7 @@ class Project(models.Model):
     category = models.CharField(max_length=225)
     file_url = models.CharField(max_length=225, null=True)
     image_url = models.CharField(max_length=225, null=True)
-    views = models.IntegerField(null=True)
+    views = models.IntegerField(null=True, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     edited_at = models.DateTimeField(auto_now=True)
 

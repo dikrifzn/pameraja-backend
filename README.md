@@ -362,71 +362,297 @@ This API is built using Django to manage users, social media accounts, projects,
 
 13. **Create Project**
     - **Method:** POST
-    - **Endpoint:** `/api/projects`
+    - **Endpoint:** `/api/project/{id_user}`
     - **Description:** Add a new project.
+
+    ### Request
+    ```json
+    {
+        "title": "AI Waste Management",
+        "description": "A project to automate waste sorting using AI",
+        "category": "Environment",
+        "file_url": "https://example.com/docs/ai_waste.pdf",
+        "image_url": "https://example.com/images/waste_project.jpg"
+    }
+    ```
+
+    ### Response
+    ```json
+    {
+        "message": "Project added successfully",
+        "data": {
+            "id": 5,
+            "title": "AI Waste Management",
+            "description": "A project to automate waste sorting using AI",
+            "category": "Environment",
+            "file_url": "https://example.com/docs/ai_waste.pdf",
+            "image_url": "https://example.com/images/waste_project.jpg",
+            "views": 0,
+            "created_at": "2025-03-17T16:43:34.587595Z",
+            "edited_at": "2025-03-17T16:43:34.587633Z",
+            "id_user": 1
+        }
+    }
+    ```
 
 14. **Get Project Details**
     - **Method:** GET
-    - **Endpoint:** `/api/projects/{id}`
+    - **Endpoint:** `/api/project/{id}`
     - **Description:** Fetch project details by ID.
+
+    ### Response
+    ```json
+    {
+        "id": 5,
+        "title": "AI Waste Management",
+        "description": "A project to automate waste sorting using AI",
+        "category": "Environment",
+        "file_url": "https://example.com/docs/ai_waste.pdf",
+        "image_url": "https://example.com/images/waste_project.jpg",
+        "views": 0,
+        "created_at": "2025-03-17T16:43:34.587595Z",
+        "edited_at": "2025-03-17T16:43:34.587633Z",
+        "id_user": 1
+    }
+    ```
+
 
 15. **Update Project**
     - **Method:** PUT
-    - **Endpoint:** `/api/projects/{id}`
+    - **Endpoint:** `/api/project/5`
     - **Description:** Update project information.
+
+    ### Request
+    ```json
+    {
+        "id_user": "1",
+        "title": "Rancang Penyiraman",
+        "description": "Pembuatan sistem penyiraman",
+        "category": "pendidikan, Manajemen",
+        "file_url": "test",
+        "image_url": "test"
+    }
+    ```
+
+    ### Response
+    ```json
+    {
+        "message": "Project User updated successfully",
+        "data": {
+            "id": 2,
+            "title": "Rancang Penyiraman",
+            "description": "Pembuatan sistem penyiraman",
+            "category": "pendidikan, Manajemen",
+            "file_url": "test",
+            "image_url": "test",
+            "views": 0,
+            "created_at": "2025-03-08T07:51:10.012813Z",
+            "edited_at": "2025-03-17T17:23:06.403229Z",
+            "id_user": 1
+        }
+    }
+    ```
+
 
 16. **Delete Project**
     - **Method:** DELETE
-    - **Endpoint:** `/api/projects/{id}`
+    - **Endpoint:** `/api/project/{id_user}`
     - **Description:** Delete a specific project.
+
+    ### Request
+    ```json
+    {
+        "project_id": "2"
+    }
+    ```
+
+    ### Response
+    ```json
+    {
+        "message": "Project berhasil dihapus"
+    }
+    ```
 
 17. **Search Projects**
     - **Method:** GET
-    - **Endpoint:** `/api/projects/search`
+    - **Endpoint:** `/api/project?search={string}`
     - **Description:** Search projects by keywords, category, etc.
+
+    ### Response
+    ```json
+    {
+        "count": 2,
+        "next": null,
+        "previous": null,
+        "results": [
+            {
+                "id": 4,
+                "title": "Sistem Penyiraman",
+                "description": "Pembuatan sistem penyiraman",
+                "category": "pendidikan, Manajemen",
+                "file_url": "test",
+                "image_url": "test",
+                "views": 0,
+                "created_at": "2025-03-17T16:33:42.481912Z",
+                "edited_at": "2025-03-17T16:33:42.481957Z",
+                "id_user": 1
+            },
+            {
+                "id": 3,
+                "title": "Sistem Penyiraman",
+                "description": "Pembuatan sistem penyiraman",
+                "category": "pendidikan, Manajemen",
+                "file_url": "test",
+                "image_url": "test",
+                "views": 0,
+                "created_at": "2025-03-08T07:52:39.491773Z",
+                "edited_at": "2025-03-08T07:52:39.491805Z",
+                "id_user": 1
+            }
+        ]
+    }
+    ```
+
 
 ---
 
 ### **Interaction (Likes and Comments)**
-18. **Like Project**
+18. **Like and Unlike Project**
     - **Method:** POST
-    - **Endpoint:** `/api/projects/{id}/like`
+    - **Endpoint:** `/api/like/{id}`
     - **Description:** Like a specific project.
 
-19. **Unlike Project**
-    - **Method:** DELETE
-    - **Endpoint:** `/api/projects/{id}/unlike`
-    - **Description:** Unlike a specific project.
+    ### Response
+    if haven't liked yet
+    ```json
+    {
+        "message": "User or Project not found"
+    }
+    ```
+    if have liked
+    ```json
+    {
+        "message": "Like removed successfully"
+    }
+    ```
 
-20. **Get Project Likes**
+19. **Get Project Likes and list user like**
     - **Method:** GET
-    - **Endpoint:** `/api/projects/{id}/likes`
+    - **Endpoint:** `/api/like/{id_project}`
     - **Description:** Fetch likes for a project.
 
-21. **Add Comment**
+    ### Response
+    ```json
+    {
+    "message": "Likes retrieved successfully",
+    "likes_count": 1,
+    "liked_by": [
+            {
+                "id": 1,
+                "name": "user",
+                "email": "user@gmail.com",
+                "position": "CEO Google and Alibaba",
+                "address": "Jl. Mangku Bumi No. 140",
+                "created_at": "2025-01-26T13:42:32.869581Z",
+                "edited_at": "2025-01-30T13:43:37.960472Z"
+            }
+        ]
+    }
+    ```
+
+20. **Add Comment**
     - **Method:** POST
-    - **Endpoint:** `/api/projects/{id}/comments`
+    - **Endpoint:** `/api/comment/{id}`
     - **Description:** Add a comment to a project.
+    ### Request
+    ```json
+    {
+        "id_user": 1,
+        "message": "This is a great project!"
+    }
+    ```
 
-22. **Get Project Comments**
+    ### Response
+    ```json
+    {
+        "message": "Comment added successfully",
+        "data": {
+            "id": 3,
+            "message": "This is a great project!",
+            "created_at": "2025-03-17T17:38:36.193744Z",
+            "edited_at": "2025-03-17T17:38:36.193774Z",
+            "id_user": 1,
+            "id_project": 5
+        }
+    }
+    ```
+21. **Get Project Comments**
     - **Method:** GET
-    - **Endpoint:** `/api/projects/{id}/comments`
+    - **Endpoint:** `/api/comment/{id}`
     - **Description:** Fetch comments for a project.
+    ### Request
+    ```json
+    {
+        "id_user": 1
+    }
+    ```
 
-23. **Update Comment**
+    ### Response
+    ```json
+    {
+        "message": "Comments Project retrieved successfully",
+        "data": [
+            {
+                "id": 3,
+                "message": "This is a great project!",
+                "created_at": "2025-03-17T17:38:36.193744Z",
+                "edited_at": "2025-03-17T17:38:36.193774Z",
+                "id_user": 1,
+                "id_project": 5
+            }
+        ]
+    }
+    ```
+22. **Update Comment**
     - **Method:** PUT/PATCH
-    - **Endpoint:** `/api/comments/{id}`
+    - **Endpoint:** `/api/comment/{id}`
     - **Description:** Update a specific comment.
+    ### Request
+    ```json
+    {
+        "message": "Updated comment text!"
+    }
+    ```
 
-24. **Delete Comment**
+    ### Response
+    ```json
+    {
+        "message": "Comment updated successfully",
+        "data": {
+            "id": 3,
+            "message": "Updated comment text!",
+            "created_at": "2025-03-17T17:38:36.193744Z",
+            "edited_at": "2025-03-17T17:41:56.922586Z",
+            "id_user": 1,
+            "id_project": 5
+        }
+    }
+    ```
+23. **Delete Comment**
     - **Method:** DELETE
-    - **Endpoint:** `/api/comments/{id}`
+    - **Endpoint:** `/api/comment/{id}`
     - **Description:** Delete a specific comment.
 
+    ### Response
+    ```json
+    {
+        "message": "Comment deleted successfully"
+    }
+    ```
 ---
 
 ### **Statistics**
-25. **Get Project Statistics**
+24. **Get Project Statistics**
     - **Method:** GET
     - **Endpoint:** `/api/projects/{id}/stats`
     - **Description:** Fetch project statistics such as views, likes, and comments.
