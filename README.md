@@ -663,12 +663,12 @@ This API is built using Django to manage users, social media accounts, projects,
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/dikrifzn/pameraja-backend.git
    ```
 
 2. Navigate into the project directory:
    ```bash
-   cd <project-directory>
+   cd pameraja-backend
    ```
 
 3. Install Pipenv (if not installed):
