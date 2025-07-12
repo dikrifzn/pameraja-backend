@@ -3,12 +3,16 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
-from .models import User, SocialMedia, Project, Comment, Like
+from .models import SocialMedia, Project, Comment, Like
 from .serializers import UserSerializer, SocialMediaSerializer, ProjectSerializer, CommentSerializer, LikeSerializer
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.parsers import MultiPartParser, FormParser
 from utils.response import success_response, error_response
+
+User = get_user_model()
+
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
@@ -35,102 +39,78 @@ class LogoutView(APIView):
         except Exception as e:
             return error_response("Logout failed", {"detail": str(e)}, 400)
 
-class UserAPI(APIView):
-    def get(self, request):
-        users = User.objects.all()
-        serializer = UserSerializer(users, many=True)
-        return success_response("User data retrieved successfully", serializer.data)
+class UserProfileAPI(APIView):
+    permission_classes = [IsAuthenticated]
 
-    def post(self, request):
-        serializer = UserSerializer(data=request.data)
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return success_response("User profile retrieved successfully", serializer.data)
+
+    def put(self, request):
+        serializer = UserSerializer(request.user, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return success_response("User created successfully", serializer.data, 201)
-        return error_response("Failed to create user", serializer.errors)
+            return success_response("User profile updated successfully", serializer.data)
+        return error_response("Failed to update user profile", serializer.errors)
 
-class UserProfileAPI(APIView):
-    def get(self, request, id):
-        try:
-            user = User.objects.get(id=id)
-            serializer = UserSerializer(user)
-            return success_response("User profile retrieved successfully", serializer.data)
-        except User.DoesNotExist:
-            return error_response("User not found", status_code=404)
+    def delete(self, request):
+        request.user.delete()
+        return success_response("User deleted successfully", status_code=204)
 
-    def put(self, request, id):
-        try:
-            user = User.objects.get(id=id)
-            serializer = UserSerializer(user, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return success_response("User profile updated successfully", serializer.data)
-            return error_response("Failed to update user profile", serializer.errors)
-        except User.DoesNotExist:
-            return error_response("User not found", status_code=404)
-
-    def delete(self, request, id):
-        try:
-            user = User.objects.get(id=id)
-            user.delete()
-            return success_response("User deleted successfully", status_code=204)
-        except User.DoesNotExist:
-            return error_response("User not found", status_code=404)
 
 class SocialMediaAPI(APIView):
-    def get(self, request, id):
-        if not User.objects.filter(id=id).exists():
-            return error_response("User not found", status_code=404)
-        socialmedias = SocialMedia.objects.filter(id_user=id)
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        socialmedias = SocialMedia.objects.filter(id_user=request.user)
         serializer = SocialMediaSerializer(socialmedias, many=True)
         return success_response("Social Media retrieved successfully", serializer.data)
 
-    def post(self, request, id):
-        if not User.objects.filter(id=id).exists():
-            return error_response("User not found", status_code=404)
-        serializer = SocialMediaSerializer(data=request.data)
+    def post(self, request):
+        data = request.data.copy()
+        data['id_user'] = request.user.id
+        serializer = SocialMediaSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return success_response("Social media account added successfully", serializer.data, 201)
         return error_response("Failed to add social media", serializer.errors)
 
     def put(self, request, id):
-        id_user = request.data.get("id_user")
         try:
-            user = User.objects.get(id=id_user)
-            socialmedia = SocialMedia.objects.get(id=id, id_user=user)
+            socialmedia = SocialMedia.objects.get(id=id, id_user=request.user)
             serializer = SocialMediaSerializer(socialmedia, data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 return success_response("Social Media updated successfully", serializer.data)
             return error_response("Failed to update Social Media", serializer.errors)
-        except (User.DoesNotExist, SocialMedia.DoesNotExist):
-            return error_response("User or Social Media not found", status_code=404)
+        except SocialMedia.DoesNotExist:
+            return error_response("Social Media not found", status_code=404)
 
     def delete(self, request, id):
-        social_media_id = request.data.get("social_media_id")
         try:
-            social_media = SocialMedia.objects.get(id=social_media_id, id_user_id=id)
+            social_media = SocialMedia.objects.get(id=id, id_user=request.user)
             social_media.delete()
             return success_response("Social Media deleted successfully")
         except SocialMedia.DoesNotExist:
             return error_response("Social Media not found", status_code=404)
 
+
 class ProjectAPI(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+
     def get(self, request, id=None):
         query = request.GET.get('search')
-        id_user = request.GET.get('id_user')
 
         if id is not None:
             try:
-                project = Project.objects.get(id=id)
+                project = Project.objects.get(id=id, id_user=request.user)
                 serializer = ProjectSerializer(project)
                 return success_response("Project retrieved", serializer.data)
             except Project.DoesNotExist:
                 return error_response("Project not found", status_code=404)
 
-        projects = Project.objects.all().order_by('-created_at')
-        if id_user:
-            projects = projects.filter(id_user=id_user)
+        projects = Project.objects.filter(id_user=request.user).order_by('-created_at')
         if query:
             projects = projects.filter(Q(title__icontains=query) | Q(description__icontains=query))
 
@@ -143,11 +123,10 @@ class ProjectAPI(APIView):
             "data": serializer.data
         })
 
-    def post(self, request, id):
-        if not User.objects.filter(id=id).exists():
-            return error_response("User not found", status_code=404)
+    def post(self, request):
         request_data = request.data.copy()
-        request_data['id_user'] = id
+        request_data['id_user'] = request.user.id
+
         serializer = ProjectSerializer(data=request_data)
         if serializer.is_valid():
             serializer.save()
@@ -155,28 +134,29 @@ class ProjectAPI(APIView):
         return error_response("Failed to add project", serializer.errors)
 
     def put(self, request, id):
-        id_user = request.data.get("id_user")
         try:
-            user = User.objects.get(id=id_user)
-            project = Project.objects.get(id=id, id_user=user)
-        except (User.DoesNotExist, Project.DoesNotExist):
-            return error_response("User or Project not found", status_code=404)
-        serializer = ProjectSerializer(project, data=request.data)
+            project = Project.objects.get(id=id, id_user=request.user)
+        except Project.DoesNotExist:
+            return error_response("Project not found", status_code=404)
+
+        serializer = ProjectSerializer(project, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return success_response("Project updated successfully", serializer.data)
         return error_response("Failed to update project", serializer.errors)
 
     def delete(self, request, id):
-        project_id = request.data.get("project_id")
         try:
-            project = Project.objects.get(id=project_id, id_user_id=id)
+            project = Project.objects.get(id=id, id_user=request.user)
             project.delete()
             return success_response("Project deleted successfully")
         except Project.DoesNotExist:
             return error_response("Project not found", status_code=404)
 
+
 class CommentAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, id):
         if not Project.objects.filter(id=id).exists():
             return error_response("Project not found", status_code=404)
@@ -187,6 +167,7 @@ class CommentAPI(APIView):
     def post(self, request, id):
         data = request.data.copy()
         data['id_project'] = id
+        data['id_user'] = request.user.id
         serializer = CommentSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -195,7 +176,7 @@ class CommentAPI(APIView):
 
     def put(self, request, id):
         try:
-            comment = Comment.objects.get(id=id)
+            comment = Comment.objects.get(id=id, id_user=request.user)
         except Comment.DoesNotExist:
             return error_response("Comment not found", status_code=404)
         serializer = CommentSerializer(comment, data=request.data, partial=True)
@@ -206,13 +187,16 @@ class CommentAPI(APIView):
 
     def delete(self, request, id):
         try:
-            comment = Comment.objects.get(id=id)
+            comment = Comment.objects.get(id=id, id_user=request.user)
             comment.delete()
             return success_response("Comment deleted successfully", status_code=204)
         except Comment.DoesNotExist:
             return error_response("Comment not found", status_code=404)
 
+
 class LikeAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, id):
         if not Project.objects.filter(id=id).exists():
             return error_response("Project not found", status_code=404)
@@ -224,11 +208,10 @@ class LikeAPI(APIView):
         })
 
     def post(self, request, id):
-        id_user = request.data.get("id_user")
-        if not User.objects.filter(id=id_user).exists() or not Project.objects.filter(id=id).exists():
-            return error_response("User or Project not found", status_code=404)
+        if not Project.objects.filter(id=id).exists():
+            return error_response("Project not found", status_code=404)
 
-        like, created = Like.objects.get_or_create(id_user_id=id_user, id_project_id=id)
+        like, created = Like.objects.get_or_create(id_user=request.user, id_project_id=id)
         if not created:
             like.delete()
             return success_response("Like removed successfully")

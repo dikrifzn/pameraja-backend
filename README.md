@@ -1,710 +1,470 @@
-# Django API Documentation
+# 💼 PamerAja API
 
-## Overview
-This API is built using Django to manage users, social media accounts, projects, and user interactions such as likes and comments.
+API ini dibuat menggunakan Django & Django REST Framework untuk mengelola pengguna, media sosial, proyek, komentar, dan fitur interaksi lainnya. Dokumentasi ini mengikuti struktur collection Postman yang telah disiapkan.
 
----
+## 🌐 Base URL
 
-## **Database Design**
-### Users Table
-| Field         | Type    | Constraints               |
-|---------------|---------|---------------------------|
-| id            | int     | Primary Key, Auto Increment |
-| nama          | varchar |                           |
-| email         | varchar | Unique                    |
-| position      | varchar |                           |
-| password      | varchar |                           |
-| role          | enum    |                           |
-| address       | varchar |                           |
-| created_at    | varchar |                           |
-| edited_at     | varchar |                           |
+```
+{{base_url}} = http://127.0.0.1:8000/api
+```
 
-### Social_Media Table
-| Field    | Type | Constraints                         |
-|----------|------|-------------------------------------|
-| id       | int  | Primary Key, Auto Increment         |
-| id_user  | int  | Foreign Key (Users.id)              |
-| name     | varchar |                                   |
-| url      | varchar |                                   |
+## 🔐 Authentication
 
-### Projects Table
-| Field       | Type    | Constraints                    |
-|-------------|---------|--------------------------------|
-| id          | int     | Primary Key, Auto Increment    |
-| id_user     | int     | Foreign Key (Users.id)         |
-| title       | varchar |                                |
-| description | text    |                                |
-| category    | enum    |                                |
-| file_url    | varchar |                                |
-| image_url   | varchar |                                |
-| views       | int     |                                |
-| created_at  | date    |                                |
-| edited_at   | date    |                                |
+### 1. Register
 
-### Likes Table
-| Field       | Type | Constraints                      |
-|-------------|------|----------------------------------|
-| id          | int  | Primary Key, Auto Increment      |
-| id_user     | int  | Foreign Key (Users.id)           |
-| id_project  | int  | Foreign Key (Projects.id)        |
+* **Endpoint:** `POST {{base_url}}/auth/register/`
+* **Headers:** `Content-Type: application/json`
+* **Body:**
 
-### Comments Table
-| Field       | Type | Constraints                      |
-|-------------|------|----------------------------------|
-| id          | int  | Primary Key, Auto Increment      |
-| id_user     | int  | Foreign Key (Users.id)           |
-| id_project  | int  | Foreign Key (Projects.id)        |
-| content     | text |                                  |
-| created_at  | date |                                  |
-| edited_at   | date |                                  |
+```json
+{
+  "username": "testuser",
+  "password": "testpassword",
+  "email": "test@example.com"
+}
+```
 
----
+* **Response:**
 
-## **Endpoints**
+```json
+{
+  "status": true,
+  "message": "User registered successfully",
+  "data": {
+    "id": 1,
+    "username": "testuser",
+    "email": "test@example.com"
+  }
+}
+```
 
-### **Authentication**
-1. **User Registration**
-   - **Method:** POST
-   - **Endpoint:** `/api/auth/register`
-   - **Description:** Register a new user.
+### 2. Login
 
-2. **User Login**
-   - **Method:** POST
-   - **Endpoint:** `/api/auth/login`
-   - **Description:** Authenticate user and issue token.
+* **Endpoint:** `POST {{base_url}}/auth/login/`
+* **Body:**
 
-3. **User Logout**
-   - **Method:** POST
-   - **Endpoint:** `/api/auth/logout`
-   - **Description:** Log the user out.
+```json
+{
+  "username": "testuser",
+  "password": "testpassword"
+}
+```
 
-4. **Password Reset**
-   - **Method:** POST
-   - **Endpoint:** `/api/auth/reset-password`
-   - **Description:** Initiate password reset process.
+* **Response:**
 
----
+```json
+{
+  "status": true,
+  "message": "Login successful",
+  "data": {
+    "access": "<JWT_ACCESS_TOKEN>",
+    "refresh": "<JWT_REFRESH_TOKEN>"
+  }
+}
+```
 
-### **User Management**
-5. **Get User Profile**
-   - **Method:** GET
-   - **Endpoint:** `/api/users/{id}`
-   - **Description:** Fetch user profile by ID.
+### 3. Refresh Token
 
-    ### Response
-    if success
-   ```json
-    {
-        "message": "User profile retrieved successfully",
-        "data": {
-            "id": 1,
-            "name": "User Example",
-            "email": "user@gmail.com",
-            "position": "CEO Google",
-            "address": "Jl. Veteran No. 140",
-            "created_at": "2025-01-26T13:42:32.869581Z",
-            "edited_at": "2025-01-26T13:42:32.869617Z"
-        }
-    }
-    ```
+* **Endpoint:** `POST {{base_url}}/auth/token/refresh/`
+* **Body:**
 
-    if not found
-    ```json
-    {
-        "message": "User not found"
-    }
-    ```
+```json
+{
+  "refresh": "{{refresh_token}}"
+}
+```
 
-6. **Update User Profile**
-   - **Method:** PUT/PATCH
-   - **Endpoint:** `/api/users/{id}`
-   - **Description:** Update user profile information.
+* **Response:**
 
-    ### Request
-    ```json
-    {
-        {
-            "name": "User Example",
-            "email": "user@gmail.com",
-            "position": "CEO Google",
-            "address": "Jl. Veteran No. 140",
-            "password": "user123" //opsional
-        }
-    }
-    ```
-    ### Response
-    if success
-   ```json
-    {
-        "message": "User profile updated successfully",
-        "data": {
-            "id": 1,
-            "name": "User Example",
-            "email": "user@gmail.com",
-            "position": "CEO Google",
-            "address": "Jl. Veteran No. 140",
-            "created_at": "2025-01-26T13:42:32.869581Z",
-            "edited_at": "2025-01-26T13:42:32.869617Z"
-        }
-    }
-    ```
+```json
+{
+  "status": true,
+  "message": "Token refreshed",
+  "data": {
+    "access": "<NEW_ACCESS_TOKEN>"
+  }
+}
+```
 
-    if error
-    ```json
-    {
-        "message": "Failed to update user profile",
-        "errors": {
-            "error point": [
-                "Description problem"
-            ]
-        }
-    }
-    ```
+### 4. Logout
 
-   if user not found
-      ```json
-    {
-        "message": "User not found"
-    }
-   ```
+* **Endpoint:** `POST {{base_url}}/auth/logout/`
+* **Headers:** `Authorization: Bearer {{access_token}}`
+* **Body:**
 
+```json
+{
+  "refresh": "{{refresh_token}}"
+}
+```
 
-7. **Delete User**
-   - **Method:** DELETE
-   - **Endpoint:** `/api/users/{id}`
-   - **Description:** Delete a user account.
+* **Response:**
 
-    ### Response
-   if success
-
-   ```json
-    {
-        "message": "User deleted successfully"
-    }
-   ```
-
-   if user not found
-      ```json
-    {
-        "message": "User not found"
-    }
-   ```
+```json
+{
+  "status": true,
+  "message": "Successfully logged out"
+}
+```
 
 ---
 
-### **Social Media Management**
-8. **Add Social Media**
-   - **Method:** POST
-   - **Endpoint:** `/api/social-media/{id_user}`
-   - **Description:** Add a social media account for the user.
+## 👤 User Profile
 
-    ### Request
-    ```json
-    {
-        "id_user": "1",
-        "name": "Instagram",
-        "url": "https://instagram.com/dikrifzn"
-    }
-    ```
-    ### Response
-    if user not found
-      ```json
-    {
-        "message": "User not found"
-    }
-    ```
-    if success
-    ```json
-    {
-        "message": "Social media account added successfully",
-        "data": {
-            "id": 1,
-            "name": "Instagram",
-            "url": "https://instagram.com/example",
-            "created_at": "2025-01-31T15:17:02.507805Z",
-            "edited_at": "2025-01-31T15:17:02.507847Z",
-            "id_user": 1
-        }
-    }
-    ```
+### 5. Get Profile
 
-9. **Get Social Media**
-   - **Method:** GET
-   - **Endpoint:** `/api/social-media/{id_user}`
-   - **Description:** Fetch social media accounts by user ID.
+* **Endpoint:** `GET {{base_url}}/users/`
+* **Headers:** `Authorization: Bearer {{access_token}}`
+* **Response:**
 
-    ### Response
-    if user not found
-    ```json
-    {
-        "message": "User not found"
-    }
-    ```
+```json
+{
+  "status": true,
+  "message": "User profile retrieved",
+  "data": {
+    "id": 1,
+    "username": "testuser",
+    "email": "test@example.com",
+    "position": "CEO",
+    "address": "Jl. Veteran No. 140"
+  }
+}
+```
 
-    if success
-    ```json
-    {
-        "message": "Social Media User retrieved successfully",
-        "data": {
-            "id": 1,
-            "name": "instagram",
-            "url": "https://www.instagram.com/example",
-            "created_at": "2025-01-27T09:59:50.957601Z",
-            "edited_at": "2025-01-27T09:59:50.957640Z",
-            "id_user": 1
-        }
-    }
+### 6. Update Profile
 
-10. **Update Social Media**
-    - **Method:** PUT
-    - **Endpoint:** `/api/social-media/{id}`
-    - **Description:** Update social media account information.
+* **Endpoint:** `PUT {{base_url}}/users/`
+* **Headers:** `Authorization: Bearer {{access_token}}`
+* **Body:**
 
-    ### Request
-    ```json
-    {
-        "id_user": "1",
-        "name": "Instagram",
-        "url": "https://instagram.com/example"
-    }
-    ```
+```json
+{
+  "username": "updateduser",
+  "email": "userupdate@gmail.com",
+  "position": "Designer",
+  "address": "Jl. Baru"
+}
+```
 
-    ### Response
-    if user not found
-    ```json
-    {
-        "message": "User not found"
-    }
-    ```
+* **Response:**
 
-    if success
-    ```json
-    {
-        "message": "Social Media User updated successfully",
-        "data": {
-            "id": 3,
-            "name": "Instagram",
-            "url": "https://instagram.com/example",
-            "created_at": "2025-01-31T15:17:02.507805Z",
-            "edited_at": "2025-02-02T15:27:21.042478Z",
-            "id_user": 1
-        }
-    }
-    ```
+```json
+{
+  "status": true,
+  "message": "User profile updated successfully",
+  "data": {
+    "username": "updateduser",
+    "email": "userupdate@gmail.com",
+    "position": "Designer",
+    "address": "Jl. Baru"
+  }
+}
+```
 
-    if error
-    ```json
-    {
-        "message": "Failed to update user Social Media User",
-        "errors": {
-            "error point": [
-                "Description problem"
-            ]
-        }
-    }
-    ```
+### 7. Delete Profile
 
-11. **Delete Social Media**
-    - **Method:** DELETE
-    - **Endpoint:** `/api/social-media/{id}`
-    - **Description:** Delete a specific social media account.
-    
-    ### Request
-    ```json
-    {
-        "social_media_id": "1"
-    }
-    ```
-    ### Response
-    if user not found
-    ```json
-    {
-        "message": "User not found"
-    }
-    ```
-     
-    if success
-    ```json
-    {
-        "message": "Social Media berhasil dihapus"
-    }
-    ```
----
+* **Endpoint:** `DELETE {{base_url}}/users/`
+* **Headers:** `Authorization: Bearer {{access_token}}`
+* **Response:**
 
-### **Project Management**
-12. **Get All Projects**
-    - **Method:** GET
-    - **Endpoint:** `/api/project/`
-    - **Description:** Fetch all projects.
-
-    ### Response
-    ```json
-    {
-        "count": 1,
-        "next": null,
-        "previous": null,
-        "results": [
-            {
-                "id": 1,
-                "title": "Sistem Absensi",
-                "description": "Pembuatan sistem absensi",
-                "category": "pendidikan, Manajemen",
-                "file_url": "test",
-                "image_url": "test",
-                "views": 1,
-                "created_at": "2025-01-27T09:52:35.810295Z",
-                "edited_at": "2025-01-27T09:52:35.810337Z",
-                "id_user": 1
-            }
-        ]
-    }
-    ```
-
-13. **Create Project**
-    - **Method:** POST
-    - **Endpoint:** `/api/project/{id_user}`
-    - **Description:** Add a new project.
-
-    ### Request
-    ```json
-    {
-        "title": "AI Waste Management",
-        "description": "A project to automate waste sorting using AI",
-        "category": "Environment",
-        "file_url": "https://example.com/docs/ai_waste.pdf",
-        "image_url": "https://example.com/images/waste_project.jpg"
-    }
-    ```
-
-    ### Response
-    ```json
-    {
-        "message": "Project added successfully",
-        "data": {
-            "id": 5,
-            "title": "AI Waste Management",
-            "description": "A project to automate waste sorting using AI",
-            "category": "Environment",
-            "file_url": "https://example.com/docs/ai_waste.pdf",
-            "image_url": "https://example.com/images/waste_project.jpg",
-            "views": 0,
-            "created_at": "2025-03-17T16:43:34.587595Z",
-            "edited_at": "2025-03-17T16:43:34.587633Z",
-            "id_user": 1
-        }
-    }
-    ```
-
-14. **Get Project Details**
-    - **Method:** GET
-    - **Endpoint:** `/api/project/{id}`
-    - **Description:** Fetch project details by ID.
-
-    ### Response
-    ```json
-    {
-        "id": 5,
-        "title": "AI Waste Management",
-        "description": "A project to automate waste sorting using AI",
-        "category": "Environment",
-        "file_url": "https://example.com/docs/ai_waste.pdf",
-        "image_url": "https://example.com/images/waste_project.jpg",
-        "views": 0,
-        "created_at": "2025-03-17T16:43:34.587595Z",
-        "edited_at": "2025-03-17T16:43:34.587633Z",
-        "id_user": 1
-    }
-    ```
-
-
-15. **Update Project**
-    - **Method:** PUT
-    - **Endpoint:** `/api/project/5`
-    - **Description:** Update project information.
-
-    ### Request
-    ```json
-    {
-        "id_user": "1",
-        "title": "Rancang Penyiraman",
-        "description": "Pembuatan sistem penyiraman",
-        "category": "pendidikan, Manajemen",
-        "file_url": "test",
-        "image_url": "test"
-    }
-    ```
-
-    ### Response
-    ```json
-    {
-        "message": "Project User updated successfully",
-        "data": {
-            "id": 2,
-            "title": "Rancang Penyiraman",
-            "description": "Pembuatan sistem penyiraman",
-            "category": "pendidikan, Manajemen",
-            "file_url": "test",
-            "image_url": "test",
-            "views": 0,
-            "created_at": "2025-03-08T07:51:10.012813Z",
-            "edited_at": "2025-03-17T17:23:06.403229Z",
-            "id_user": 1
-        }
-    }
-    ```
-
-
-16. **Delete Project**
-    - **Method:** DELETE
-    - **Endpoint:** `/api/project/{id_user}`
-    - **Description:** Delete a specific project.
-
-    ### Request
-    ```json
-    {
-        "project_id": "2"
-    }
-    ```
-
-    ### Response
-    ```json
-    {
-        "message": "Project berhasil dihapus"
-    }
-    ```
-
-17. **Search Projects**
-    - **Method:** GET
-    - **Endpoint:** `/api/project?search={string}`
-    - **Description:** Search projects by keywords, category, etc.
-
-    ### Response
-    ```json
-    {
-        "count": 2,
-        "next": null,
-        "previous": null,
-        "results": [
-            {
-                "id": 4,
-                "title": "Sistem Penyiraman",
-                "description": "Pembuatan sistem penyiraman",
-                "category": "pendidikan, Manajemen",
-                "file_url": "test",
-                "image_url": "test",
-                "views": 0,
-                "created_at": "2025-03-17T16:33:42.481912Z",
-                "edited_at": "2025-03-17T16:33:42.481957Z",
-                "id_user": 1
-            },
-            {
-                "id": 3,
-                "title": "Sistem Penyiraman",
-                "description": "Pembuatan sistem penyiraman",
-                "category": "pendidikan, Manajemen",
-                "file_url": "test",
-                "image_url": "test",
-                "views": 0,
-                "created_at": "2025-03-08T07:52:39.491773Z",
-                "edited_at": "2025-03-08T07:52:39.491805Z",
-                "id_user": 1
-            }
-        ]
-    }
-    ```
-
+```json
+{
+  "status": true,
+  "message": "User deleted successfully"
+}
+```
 
 ---
 
-### **Interaction (Likes and Comments)**
-18. **Like and Unlike Project**
-    - **Method:** POST
-    - **Endpoint:** `/api/like/{id}`
-    - **Description:** Like a specific project.
+## 🌐 Social Media
 
-    ### Response
-    if haven't liked yet
-    ```json
+### 8. Get Social Media
+
+* **Endpoint:** `GET {{base_url}}/users/social-media/`
+* **Headers:** `Authorization: Bearer {{access_token}}`
+* **Response:**
+
+```json
+{
+  "status": true,
+  "message": "Social media retrieved",
+  "data": [
     {
-        "message": "User or Project not found"
+      "id": 1,
+      "name": "Instagram",
+      "url": "https://instagram.com/testuser"
     }
-    ```
-    if have liked
-    ```json
-    {
-        "message": "Like removed successfully"
-    }
-    ```
+  ]
+}
+```
 
-19. **Get Project Likes and list user like**
-    - **Method:** GET
-    - **Endpoint:** `/api/like/{id_project}`
-    - **Description:** Fetch likes for a project.
+### 9. Create Social Media
 
-    ### Response
-    ```json
-    {
-    "message": "Likes retrieved successfully",
-    "likes_count": 1,
+* **Endpoint:** `POST {{base_url}}/users/social-media/`
+* **Body:**
+
+```json
+{
+  "name": "Instagram",
+  "url": "https://instagram.com/testuser"
+}
+```
+
+* **Response:**
+
+```json
+{
+  "status": true,
+  "message": "Social media created",
+  "data": {
+    "id": 1,
+    "name": "Instagram",
+    "url": "https://instagram.com/testuser"
+  }
+}
+```
+
+### 10. Update Social Media
+
+* **Endpoint:** `PUT {{base_url}}/users/social-media/{id}/`
+* **Body:**
+
+```json
+{
+  "name": "Updated IG",
+  "url": "https://instagram.com/updateduser"
+}
+```
+
+### 11. Delete Social Media
+
+* **Endpoint:** `DELETE {{base_url}}/users/social-media/{id}/`
+
+---
+
+## 📁 Project
+
+### 12. Create Project
+
+* **Endpoint:** `POST {{base_url}}/projects/`
+* **Headers:** `Content-Type: multipart/form-data`
+* **Body (Form Data):**
+
+  * `title`: "My Project"
+  * `description`: "Project description"
+  * `category`: "Design"
+  * `image_url`: (file)
+* **Response:**
+
+```json
+{
+  "status": true,
+  "message": "Project created successfully",
+  "data": {
+    "id": 1,
+    "title": "My Project",
+    "description": "Project description",
+    "category": "Design",
+    "image_url": "http://..."
+  }
+}
+```
+
+### 13. Update Project
+
+* **Endpoint:** `PUT {{base_url}}/projects/{id}/`
+* **Body (Form Data):** sama seperti create
+* **Response:**
+
+```json
+{
+  "status": true,
+  "message": "Project updated successfully",
+  "data": {
+    "id": 1,
+    "title": "Updated Project",
+    "description": "Updated description",
+    "category": "Updated Category",
+    "image_url": "http://..."
+  }
+}
+```
+
+### 14. Delete Project
+
+* **Endpoint:** `DELETE {{base_url}}/projects/{id}/`
+* **Response:**
+
+```json
+{
+  "status": true,
+  "message": "Project deleted successfully"
+}
+```
+
+---
+
+## ❤️ Likes
+
+### 15. Add or Remove Like
+
+* **Endpoint:** `POST {{base_url}}/projects/{id}/likes/`
+
+### 16. Get Likes
+
+* **Endpoint:** `GET {{base_url}}/projects/{id}/likes/`
+* **Response:**
+
+```json
+{
+  "status": true,
+  "message": "Likes retrieved",
+  "data": {
+    "likes_count": 5,
     "liked_by": [
-            {
-                "id": 1,
-                "name": "user",
-                "email": "user@gmail.com",
-                "position": "CEO Google and Alibaba",
-                "address": "Jl. Mangku Bumi No. 140",
-                "created_at": "2025-01-26T13:42:32.869581Z",
-                "edited_at": "2025-01-30T13:43:37.960472Z"
-            }
-        ]
-    }
-    ```
-
-20. **Add Comment**
-    - **Method:** POST
-    - **Endpoint:** `/api/comment/{id}`
-    - **Description:** Add a comment to a project.
-    ### Request
-    ```json
-    {
-        "id_user": 1,
-        "message": "This is a great project!"
-    }
-    ```
-
-    ### Response
-    ```json
-    {
-        "message": "Comment added successfully",
-        "data": {
-            "id": 3,
-            "message": "This is a great project!",
-            "created_at": "2025-03-17T17:38:36.193744Z",
-            "edited_at": "2025-03-17T17:38:36.193774Z",
-            "id_user": 1,
-            "id_project": 5
-        }
-    }
-    ```
-21. **Get Project Comments**
-    - **Method:** GET
-    - **Endpoint:** `/api/comment/{id}`
-    - **Description:** Fetch comments for a project.
-    ### Request
-    ```json
-    {
-        "id_user": 1
-    }
-    ```
-
-    ### Response
-    ```json
-    {
-        "message": "Comments Project retrieved successfully",
-        "data": [
-            {
-                "id": 3,
-                "message": "This is a great project!",
-                "created_at": "2025-03-17T17:38:36.193744Z",
-                "edited_at": "2025-03-17T17:38:36.193774Z",
-                "id_user": 1,
-                "id_project": 5
-            }
-        ]
-    }
-    ```
-22. **Update Comment**
-    - **Method:** PUT/PATCH
-    - **Endpoint:** `/api/comment/{id}`
-    - **Description:** Update a specific comment.
-    ### Request
-    ```json
-    {
-        "message": "Updated comment text!"
-    }
-    ```
-
-    ### Response
-    ```json
-    {
-        "message": "Comment updated successfully",
-        "data": {
-            "id": 3,
-            "message": "Updated comment text!",
-            "created_at": "2025-03-17T17:38:36.193744Z",
-            "edited_at": "2025-03-17T17:41:56.922586Z",
-            "id_user": 1,
-            "id_project": 5
-        }
-    }
-    ```
-23. **Delete Comment**
-    - **Method:** DELETE
-    - **Endpoint:** `/api/comment/{id}`
-    - **Description:** Delete a specific comment.
-
-    ### Response
-    ```json
-    {
-        "message": "Comment deleted successfully"
-    }
-    ```
----
-
-### **Statistics**
-24. **Get Project Statistics**
-    - **Method:** GET
-    - **Endpoint:** `/api/projects/{id}/stats`
-    - **Description:** Fetch project statistics such as views, likes, and comments.
+      {
+        "id": 1,
+        "username": "user"
+      }
+    ]
+  }
+}
+```
 
 ---
 
-### **Setup Instructions**
+## 💬 Comments
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/dikrifzn/pameraja-backend.git
-   ```
+### 17. Get Comments
 
-2. Navigate into the project directory:
-   ```bash
-   cd pameraja-backend
-   ```
+* **Endpoint:** `GET {{base_url}}/projects/{id}/comments/`
 
-3. Install Pipenv (if not installed):
-   ```bash
-   pip install pipenv
-   ```
+### 18. Create Comment
 
-4. Install dependencies:
-   ```bash
-   pipenv install
-   ```
+* **Endpoint:** `POST {{base_url}}/projects/{id}/comments/`
+* **Body:**
 
-5. Activate the virtual environment:
-   ```bash
-   pipenv shell
-   ```
+```json
+{
+  "content": "Great project!"
+}
+```
 
-6. Run database migrations:
-   ```bash
-   python manage.py migrate
-   ```
+* **Response:**
 
-7. Start the server:
-   ```bash
-   python manage.py runserver
-   ```
+```json
+{
+  "status": true,
+  "message": "Comment created",
+  "data": {
+    "id": 1,
+    "content": "Great project!",
+    "user": "testuser"
+  }
+}
+```
 
-8. Access the API documentation at `/api/docs` (if using tools like Django REST Framework Swagger or DRF-YASG).
+### 19. Update Comment
+
+* **Endpoint:** `PUT {{base_url}}/comments/{id}/`
+* **Body:**
+
+```json
+{
+  "content": "Updated content"
+}
+```
+
+### 20. Delete Comment
+
+* **Endpoint:** `DELETE {{base_url}}/comments/{id}/`
 
 ---
 
-## **Technologies Used**
-- Django
-- Django REST Framework
-- PostgreSQL/MySQL (configurable)
-- JWT for authentication
-- Pipenv for environment management
+## 🚧 Database Models
 
-For additional questions, contact the developer team.
+### User
+
+| Field       | Type                |
+| ----------- | ------------------- |
+| username    | CharField           |
+| email       | EmailField (unique) |
+| position    | CharField           |
+| address     | TextField           |
+| image\_url  | ImageField          |
+| created\_at | DateTime            |
+| edited\_at  | DateTime            |
+
+### SocialMedia
+
+| Field       | Type              |
+| ----------- | ----------------- |
+| id\_user    | ForeignKey (User) |
+| name        | CharField         |
+| url         | CharField         |
+| created\_at | DateTime          |
+| edited\_at  | DateTime          |
+
+### Project
+
+| Field       | Type                 |
+| ----------- | -------------------- |
+| id\_user    | ForeignKey (User)    |
+| title       | CharField            |
+| description | TextField            |
+| category    | CharField            |
+| file\_url   | CharField (optional) |
+| image\_url  | ImageField           |
+| views       | Integer              |
+| created\_at | DateTime             |
+| edited\_at  | DateTime             |
+
+### Comment
+
+| Field       | Type                 |
+| ----------- | -------------------- |
+| id\_user    | ForeignKey (User)    |
+| id\_project | ForeignKey (Project) |
+| message     | TextField            |
+| created\_at | DateTime             |
+| edited\_at  | DateTime             |
+
+### Like
+
+| Field       | Type                 |
+| ----------- | -------------------- |
+| id\_user    | ForeignKey (User)    |
+| id\_project | ForeignKey (Project) |
+
+---
+
+## 🛠️ Setup Project Locally
+
+```bash
+git clone https://github.com/dikrifzn/pameraja-backend.git
+cd pameraja-backend
+```
+```bash
+pip install pipenv
+pipenv install
+pipenv shell
+```
+```bash
+python manage.py migrate
+python manage.py runserver
+```
+
+---
+
+## 🧰 Tech Stack
+
+* Django
+* Django REST Framework
+* JWT Authentication
+* PostgreSQL / MySQL (configurable)
+
+---
+
+📮 For more information, check out the [Postman Collection](https://github.com/dikrifzn/pameraja-backend/blob/main/PamerAja%20API.postman_collection.json)
+
+created by [Dikri Fauzan Amrulloh](https://github.com/dikrifzn/pameraja-backend)
