@@ -20,3 +20,5 @@ db.sqlite3
 # Editor files
 .vscode/
 .idea/
+# Media files
+media/

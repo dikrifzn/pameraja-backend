@@ -1,0 +1,505 @@
+{
+  "info": {
+    "_postman_id": "d30e796f-dfcb-4cf1-89e2-5e5a37a118a5",
+    "name": "PamerAja API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "45640946",
+    "_collection_link": "https://dikri-3712927.postman.co/workspace/Dikri's-Workspace~ac65496e-ed7e-4762-8de5-83ea64ef9868/collection/45640946-d30e796f-dfcb-4cf1-89e2-5e5a37a118a5?action=share&source=collection_link&creator=45640946"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000/api"
+    },
+    {
+      "key": "access_token",
+      "value": "Bearer your-access-token-here"
+    },
+    {
+      "key": "refresh_token",
+      "value": "your-refresh-token-here"
+    }
+  ],
+
+  "item": [
+    {
+      "name": "Register",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"testpassword\",\n  \"email\": \"test@example.com\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/auth/register/",
+          "host": ["{{base_url}}"],
+          "path": ["auth", "register", ""]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"testpassword\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/auth/login/",
+          "host": ["{{base_url}}"],
+          "path": ["auth", "login", ""]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Refresh Token",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/auth/token/refresh/",
+          "host": ["{{base_url}}"],
+          "path": ["auth", "token", "refresh", ""]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Logout",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/auth/logout/",
+          "host": ["{{base_url}}"],
+          "path": ["auth", "logout", ""]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Profile",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/users/",
+          "host": ["{{base_url}}"],
+          "path": ["users", ""]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Profile",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"updateduser\",\n  \"email\": \"userupdate@gmail.com\",\n  \"position\": \"Designer\",\n  \"address\": \"Jl. Baru\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/users/",
+          "host": ["{{base_url}}"],
+          "path": ["users", ""]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Profile",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/users/",
+          "host": ["{{base_url}}"],
+          "path": ["users", ""]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Social Media",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Instagram\",\n  \"url\": \"https://instagram.com/testuser\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/users/social-media/",
+          "host": ["{{base_url}}"],
+          "path": ["users", "social-media", ""]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Social Media",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Instagram\",\n  \"url\": \"https://instagram.com/testuser\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/users/social-media/",
+          "host": ["{{base_url}}"],
+          "path": ["users", "social-media", ""]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Social Media",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Updated IG\",\n  \"url\": \"https://instagram.com/updateduser\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/users/social-media/1/",
+          "host": ["{{base_url}}"],
+          "path": ["users", "social-media", "1", ""]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Social Media",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/users/social-media/1/",
+          "host": ["{{base_url}}"],
+          "path": ["users", "social-media", "1", ""]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Project",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "multipart/form-data",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "title", "value": "My Project", "type": "text" },
+            {
+              "key": "description",
+              "value": "Project description",
+              "type": "text"
+            },
+            { "key": "category", "value": "Design", "type": "text" },
+            { "key": "image_url", "type": "file", "src": "" }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/projects/",
+          "host": ["{{base_url}}"],
+          "path": ["projects", ""]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Project",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "title", "value": "My Project Update", "type": "text" },
+            {
+              "key": "description Update",
+              "value": "Project description Update",
+              "type": "text"
+            },
+            { "key": "category", "value": "Design", "type": "text" },
+            { "key": "image_url", "type": "file", "src": "" }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/projects/1/",
+          "host": ["{{base_url}}"],
+          "path": ["projects", "1"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Project",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/projects/1/",
+          "host": ["{{base_url}}"],
+          "path": ["projects", "1"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Add and Remove Like",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/projects/1/likes/",
+          "host": ["{{base_url}}"],
+          "path": ["projects", "1", "likes"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Likes",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/projects/1/likes/",
+          "host": ["{{base_url}}"],
+          "path": ["projects", "1", "likes"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Comments",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/projects/1/comments/",
+          "host": ["{{base_url}}"],
+          "path": ["projects", "1", "comments"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Comment",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"content\": \"This is a great project!\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/projects/1/comments/",
+          "host": ["{{base_url}}"],
+          "path": ["projects", "1", "comments"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Comment",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"content\": \"Updated comment content.\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/comments/1/",
+          "host": ["{{base_url}}"],
+          "path": ["projects", "1", "comments"],
+          "query": [
+            {
+              "key": "id",
+              "value": "1"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Comment",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/comments/1/",
+          "host": ["{{base_url}}"],
+          "path": ["projects", "1", "comments"],
+          "query": [
+            {
+              "key": "id",
+              "value": "1"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
